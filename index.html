@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اتاق کنترل جهان</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #020812;
+  color: #d8faff;
+  font-family: Tahoma, sans-serif;
+}
+
+header {
+  padding: 18px;
+  text-align: center;
+  background: #041522;
+  border-bottom: 1px solid #00cfff;
+  color: #00eaff;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 15px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.panel {
+  background: #061522;
+  border: 1px solid #07536a;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 0 15px #00cfff0b;
+}
+
+h3 {
+  color: #00eaff;
+  margin-top: 0;
+}
+
+.clock {
+  text-align: center;
+  font-size: 32px;
+  color: #55faff;
+  direction: ltr;
+  margin: 15px 0;
+}
+
+.date {
+  text-align: center;
+  color: #00ffae;
+  font-size: 13px;
+}
+
+.globe-container {
+  display: flex;
+  justify-content: center;
+  padding: 25px 0;
+}
+
+.globe {
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 17px,
+      #25eaff55 18px,
+      transparent 19px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 24px,
+      #25eaff55 25px,
+      transparent 26px
+    ),
+    radial-gradient(circle at 30% 30%, #20cfff, #07518a 45%, #010819 80%);
+  box-shadow:
+    inset -20px -10px 30px #000,
+    0 0 30px #00cfff88;
+  animation: rotate 12s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.status {
+  margin: 15px 0;
+}
+
+.bar {
+  height: 7px;
+  background: #102d3b;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 7px;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, #008cff, #00ffbd);
+  border-radius: 10px;
+  transition: width .5s;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.red-button {
+  display: block;
+  width: 155px;
+  height: 155px;
+  border-radius: 50%;
+  border: 5px solid #ff6577;
+  background: radial-gradient(circle, #ff2348, #790017);
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 25px auto 10px;
+  box-shadow: 0 0 30px #ff174455;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.red-button:active {
+  transform: scale(.93);
+  box-shadow: 0 0 45px #ff1744;
+}
+
+.small-button {
+  padding: 10px 14px;
+  background: #082536;
+  color: #00eaff;
+  border: 1px solid #08738a;
+  border-radius: 7px;
+  margin-top: 10px;
+}
+
+.small-button:hover {
+  background: #104158;
+}
+
+.message {
+  color: #00ffae;
+  line-height: 2;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.warning {
+  color: #ff637a;
+}
+
+footer {
+  text-align: center;
+  padding: 25px 10px;
+  color: #528398;
+  font-size: 12px;
+}
+
+.crisis {
+  background: #24030d;
+}
+
+.crisis .panel {
+  border-color: #ff2348;
+}
+
+.crisis header {
+  color: #ff526a;
+  border-color: #ff2348;
+}
+
+.crisis .globe {
+  filter: hue-rotate(100deg);
+  box-shadow: 0 0 35px #ff1744;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  header {
+    font-size: 18px;
+  }
+
+  .clock {
+    font-size: 28px;
+  }
+
+  .globe {
+    width: 160px;
+    height: 160px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  🌐 اتاق کنترل جهان
+  <div style="font-size:12px;margin-top:8px;color:#00ffae">
+    ● اتصال به شبکه ناشناس
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="grid">
+
+    <section class="panel">
+      <h3>🕒 زمان جهانی</h3>
+      <div class="clock" id="clock">00:00:00</div>
+      <div class="date" id="date"></div>
+    </section>
+
+    <section class="panel">
+      <h3>📊 وضعیت سیستم</h3>
+
+      <div class="status">
+        پردازنده
+        <span id="cpuText">34%</span>
+        <div class="bar">
+          <div class="fill" id="cpu" style="width:34%"></div>
+        </div>
+      </div>
+
+      <div class="status">
+        حافظه
+        <span id="ramText">62%</span>
+        <div class="bar">
+          <div class="fill" id="ram" style="width:62%"></div>
+        </div>
+      </div>
+
+      <div class="status">
+        ذخیره‌سازی
+        <span id="diskText">48%</span>
+        <div class="bar">
+          <div class="fill" id="disk" style="width:48%"></div>
+        </div>
+      </div>
+
+      <p style="font-size:11px;color:#6b9bab">
+        آمارها نمایشی هستند.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h3>🌍 شبکه جهانی</h3>
+
+      <div class="globe-container">
+        <div class="globe"></div>
+      </div>
+
+      <div class="message" id="networkStatus">
+        > شبکه فعال است.<br>
+        > در انتظار سیگنال ناشناس...<br>
+        > همه گره‌ها آماده‌اند.
+      </div>
+
+      <button class="small-button" onclick="scanNetwork()">
+        اسکن شبکه
+      </button>
+    </section>
+
+    <section class="panel">
+      <h3>⚠️ سیستم هشدار</h3>
+
+      <div class="warning" id="warning">
+        هیچ خطر فعالی شناسایی نشده است.
+      </div>
+
+      <button class="small-button" onclick="toggleCrisis()">
+        تغییر وضعیت بحران
+      </button>
+
+      <h3 style="margin-top:25px">📡 پیام ناشناس</h3>
+
+      <div class="message" id="anonymous">
+        بعضی چیزها بهتر است کشف نشوند...
+      </div>
+
+      <button class="small-button" onclick="newMessage()">
+        دریافت پیام جدید
+      </button>
+    </section>
+
+    <section class="panel">
+      <h3>🔴 پروتکل ناشناخته</h3>
+
+      <button class="red-button" onclick="pressRed()">
+        دکمه قرمز
+      </button>
+
+      <div class="message" id="redMessage" style="text-align:center">
+        به چیزی دست نزن...
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>🔐 مسیر مخفی</h3>
+
+      <p id="secretText" class="message">
+        این بخش قفل شده است.
+      </p>
+
+      <button class="small-button" onclick="openSecret()">
+        بررسی دسترسی
+      </button>
+    </section>
+
+    <section class="panel" style="grid-column:1/-1">
+      <h3>💻 ترمینال سیستم</h3>
+
+      <div id="terminal" class="message">
+        > سیستم راه‌اندازی شد.<br>
+        > منتظر دستور...
+      </div>
+
+      <button class="small-button" onclick="clearTerminal()">
+        پاک‌سازی ترمینال
+      </button>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  WORLD CONTROL SYSTEM · نسخه 1.0
+  <br><br>
+  این سایت یک شبیه‌سازی سرگرم‌کننده است.
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function updateClock() {
+  const now = new Date();
+
+  $("clock").textContent =
+    now.toISOString().slice(11, 19);
+
+  $("date").textContent =
+    now.toLocaleDateString("fa-IR", {
+      timeZone: "UTC",
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    }) + " · UTC";
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+// تغییر نمایشی وضعیت سیستم
+function updateStats() {
+  ["cpu", "ram", "disk"].forEach(id => {
+    const value = Math.floor(Math.random() * 75) + 15;
+
+    $(id).style.width = value + "%";
+    $(id + "Text").textContent = value + "%";
+  });
+}
+
+setInterval(updateStats, 3000);
+
+let redClicks = 0;
+
+const redEvents = [
+  "پروتکل اجرا شد؛ هیچ اتفاقی نیفتاد.",
+  "یک سیگنال ناشناس دریافت شد!",
+  "دسترسی موقت صادر شد.",
+  "هشدار: داده‌ای ناشناخته پیدا شد.",
+  "خطا 404: جهان پیدا نشد!",
+  "سیستم می‌گوید دیگر دکمه را فشار نده."
+];
+
+function pressRed() {
+  redClicks++;
+
+  const event =
+    redEvents[(redClicks - 1) % redEvents.length];
+
+  $("redMessage").textContent = event;
+
+  $("terminal").innerHTML +=
+    "<br>> " + event;
+
+  $("terminal").scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
+
+  if (redClicks >= 5) {
+    $("secretText").textContent =
+      "قفل مسیر مخفی باز شده است!";
+
+    $("secretText").style.color = "#00ffae";
+  }
+}
+
+function openSecret() {
+  if (redClicks >= 5) {
+    $("secretText").textContent =
+      "پیام نهایی: جهان همان چیزی نیست که می‌بینی. شناسه: 0x7F-UNKNOWN";
+
+    $("terminal").innerHTML +=
+      "<br>> SECRET ROUTE FOUND";
+  } else {
+    $("secretText").textContent =
+      "دسترسی رد شد! ابتدا ۵ بار دکمه قرمز را فشار بده.";
+  }
+}
+
+let crisis = false;
+
+function toggleCrisis() {
+  crisis = !crisis;
+
+  document.body.classList.toggle("crisis", crisis);
+
+  $("warning").textContent = crisis
+    ? "هشدار قرمز! حالت بحران فعال است."
+    : "هیچ خطر فعالی شناسایی نشده است.";
+
+  $("terminal").innerHTML += crisis
+    ? "<br>> CRISIS MODE ACTIVATED"
+    : "<br>> SYSTEM RESTORED";
+}
+
+const messages = [
+  "بعضی چیزها بهتر است کشف نشوند...",
+  "اگر این پیام را می‌خوانی، هنوز دیر نشده.",
+  "همه درها قفل نیستند؛ بعضی‌ها دیده نمی‌شوند.",
+  "تو اولین نفری نیستی که اینجا آمده.",
+  "سکوت هم نوعی پاسخ است.",
+  "سیگنال از جایی می‌آید که وجود ندارد."
+];
+
+function newMessage() {
+  const index = Math.floor(
+    Math.random() * messages.length
+  );
+
+  $("anonymous").textContent = messages[index];
+}
+
+function scanNetwork() {
+  $("networkStatus").textContent =
+    "> اسکن شبکه آغاز شد...";
+
+  const steps = [
+    "بررسی گره‌های ناشناس...",
+    "سه سیگنال ضعیف شناسایی شد.",
+    "منشأ سیگنال نامشخص است.",
+    "اسکن کامل شد."
+  ];
+
+  let i = 0;
+
+  const timer = setInterval(() => {
+    if (i >= steps.length) {
+      clearInterval(timer);
+      return;
+    }
+
+    $("networkStatus").innerHTML +=
+      "<br>> " + steps[i];
+
+    $("terminal").innerHTML +=
+      "<br>> " + steps[i];
+
+    i++;
+  }, 700);
+}
+
+function clearTerminal() {
+  $("terminal").innerHTML =
+    "> ترمینال پاک‌سازی شد.<br>> منتظر دستور...";
+}
+</script>
+
+</body>
+</html>
